@@ -74,3 +74,42 @@ app.post('/login', (request, response) => {
         sessionID,
     });
 });
+
+// logout
+app.post('/logout', (request, response) => {
+    const { sessionID } = request.body;
+
+    if (!sessionID || !sessions[sessionID]) {
+        return response.status(404).json({
+            message: "No se ha encontrado ninguna sesión activa",
+        });
+    }
+    delete sessions[sessionID];
+    response.status(200).json({ message: "Logout successful" });
+});
+
+// update
+app.post('/update', (request, response) => {
+    const { sessionID, email, nickname } = request.body;
+    if (!sessionID || !sessions[sessionID]) {
+        return response.status(404).json({
+            message: "No se ha encontrado ninguna sesión activa",
+        });
+    }
+    if (email) sessions[sessionID].email = email;
+    if (nickname) sessions[sessionID].nickname = nickname;
+    sessions[sessionID].lastAccessed = new Date();
+    response.status(200).json({ message: "Información actualizada" });
+});
+
+// status
+app.post('/status', (request, response) => {
+    const { sessionID } = request.query;
+    if (!sessionID || !sessions[sessionID]) {
+        return response.status(404).json({ message: "No se ha encontrado una sesión activa" });
+    }
+    response.status(200).json({
+        message: "Sesión activa",
+        session: sessions[sessionID]
+    });
+});
